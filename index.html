@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceFlow ₹ - Smart Budget Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- COVER PAGE -->
+    <section id="cover">
+        <h1 class="logo">FINANCEFLOW ₹</h1>
+        <p class="tagline">Clean Budget Modal • Manual Category Selection • Full Control</p>
+
+
+
+        <div class="launch-buttons">
+            <button id="quickStart" class="btn primary">⚡ Quick Start</button>
+
+        </div>
+    </section>
+
+
+    <!-- MAIN APP -->
+    <main id="app">
+        <div class="budget-settings">
+            <div class="budget-row">
+                <label>Monthly Income:</label>
+                <input type="number" id="monthlyIncome" placeholder="Enter monthly income">
+                <button class="btn primary" onclick="app.setIncome()">Set</button>
+                <button class="btn reset" onclick="app.resetIncome()">Reset</button>
+            </div>
+        </div>
+
+        <header class="header">
+            <div>
+                <h2>January 2026</h2>
+                <div class="balance-card">
+                    <div style="opacity: 0.9; margin-bottom: 0.5rem;">Current Balance</div>
+                    <div class="balance-amount" id="balance">₹2,00,000</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button id="addTransactionBtn" class="btn primary">➕ Add Expense</button>
+            </div>
+        </header>
+
+        <div class="main-grid">
+            <div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Spending by Category</h3>
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Budget Progress</h3>
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalSpent">₹0</div>
+                        <div>Total Spent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="incomeDisplay">₹2,00,000</div>
+                        <div>Monthly Income</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="color: var(--primary);" id="savingsRate">100%</div>
+                        <div>Savings Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div style="margin-bottom: 2rem;">
+                    <div class="transaction-header-buttons">
+                        <h3>Recent Transactions</h3>
+                        <button id="deleteAllTransactions" class="btn danger"
+                            style="font-size: 0.9rem; padding: 0.5rem 1rem;">🗑️ Delete All</button>
+                    </div>
+                    <input id="searchTransactions" placeholder="🔍 Search..." style="width: 150px; margin-top: 0.5rem;">
+                    <div class="transactions-list" id="transactionsList">
+                        No transactions yet!
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="margin-bottom: 1rem;">Budget Allocation
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <button class="btn secondary" onclick="app.setDefaultBudgets()"
+                                style="font-size: 0.8rem; padding: 0.3rem 0.8rem;">Reset Budgets</button>
+                        </div>
+                    </h3>
+                    <div id="budgetItems"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TRANSACTION MODAL -->
+        <div id="transactionModal" class="modal">
+            <h4>Add Transaction</h4>
+            <form id="transactionForm">
+                <input id="merchantInput" placeholder="Merchant (Café Coffee Day)" required>
+                <input id="amountInput" type="number" step="0.01" placeholder="Amount (₹)" required>
+                <input id="dateInput" type="date">
+
+                <label style="margin: 0.5rem 0 0.2rem 0; font-weight: 600; font-size: 0.95rem;">Category:</label>
+                <div class="category-buttons">
+                    <button type="button" class="category-btn" data-category="food"
+                        style="background: rgba(239,68,68,0.2); border-color: #ef4444;">🍽️ Food</button>
+                    <button type="button" class="category-btn" data-category="transport"
+                        style="background: rgba(245,158,11,0.2); border-color: #f59e0b;">🚗 Transport</button>
+                    <button type="button" class="category-btn" data-category="entertainment"
+                        style="background: rgba(139,92,246,0.2); border-color: #8b5cf6;">🎬 Entertainment</button>
+                    <button type="button" class="category-btn" data-category="shopping"
+                        style="background: rgba(16,185,129,0.2); border-color: #10b981;">🛍️ Shopping</button>
+                    <button type="button" class="category-btn" data-category="bills"
+                        style="background: rgba(107,114,128,0.2); border-color: #6b7280;">💡 Bills</button>
+                    <button type="button" class="category-btn active" data-category="other"
+                        style="background: rgba(156,163,175,0.2); border-color: #9ca3af;">📦 Other</button>
+                </div>
+
+                <input type="hidden" id="selectedCategory" value="other">
+
+                <div class="modal-buttons">
+                    <button type="submit" class="btn primary" style="flex: 1;">Save</button>
+                    <button type="button" id="cancelTransaction" class="btn secondary" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- BUDGET EDIT MODAL -->
+        <div id="budgetModal" class="modal">
+            <h4 id="budgetModalTitle">Set Budget</h4>
+            <input type="number" id="budgetAmountInput" placeholder="Enter budget amount (₹)" step="1000">
+            <div id="budgetWarning" class="warning-text" style="display: none;"></div>
+            <div class="modal-buttons">
+                <button class="btn primary" id="saveBudgetBtn" onclick="app.saveBudget()">Save Budget</button>
+                <button class="btn secondary" onclick="app.closeBudgetModal()">Cancel</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js" defer></script>
+</body>
+
+</html>
